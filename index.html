@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Física IV · Pozo lineal y pared infinita · Simulador 2</title>
+<style>
+:root{--ink:#202936;--sub:#566171;--border:#d6dce3;--bg:#f6f7f9;--blue:#1d5fa9;--green:#19844b;--purple:#7b48a5;--red:#c23d35;--light:#edf2f7}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;color:var(--ink);background:var(--bg);font:14px/1.45 system-ui,'Segoe UI',Arial,sans-serif}
+header{padding:15px 24px 13px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px}
+header h1{font-family:Georgia,'Times New Roman',serif;margin:0;font-weight:600;font-size:24px;letter-spacing:.1px}header p{color:var(--sub);margin:2px 0 0;font-size:12px}
+.badge{background:#eff4fa;border:1px solid #c9d8e9;border-radius:4px;padding:5px 9px;font-size:12px;white-space:nowrap}.badge.pending{background:#fff5dc;border-color:#e8c886;color:#7b5415}.badge.error{color:#972a23;background:#fff1ef;border-color:#e4b1ac}
+main{display:grid;grid-template-columns:minmax(330px,24%) minmax(0,1fr);gap:13px;max-width:1900px;margin:auto;padding:13px;align-items:start}
+.panel{background:white;border:1px solid var(--border);border-radius:5px;padding:14px;min-width:0}.sidebar{align-self:start}.section{padding-bottom:13px;margin-bottom:13px;border-bottom:1px solid #e5e8ec}.section:last-child{border:0;padding:0;margin:0}
+h2{font-size:14px;margin:0 0 10px;font-weight:700}.group-title{font-size:11px;font-weight:700;color:#647286;text-transform:uppercase;letter-spacing:.06em;margin:15px 0 7px}
+.param{margin:9px 0 14px}.param-label{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:5px;font-size:13px}.param-name{font-weight:650}.label-left{display:flex;align-items:center;gap:5px}
+.help{border:1px solid #abbccc;background:#fafcfd;color:#425b79;font-weight:bold;border-radius:50%;width:17px;height:17px;text-align:center;line-height:15px;cursor:help;font-size:11px;flex-shrink:0;padding:0}.units{color:#687587;min-width:48px;text-align:right;font-size:11px}
+.param-controls{display:grid;grid-template-columns:1fr 88px;align-items:center;gap:9px}input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}input[type=number],select{border:1px solid #bdc7d1;background:white;border-radius:4px;font:inherit;padding:6px 5px;color:var(--ink);max-width:100%}input[type=number]{width:100%;text-align:right}select{width:100%}label{cursor:pointer}
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}button.action,button.zoom-btn,button.remove{cursor:pointer;font:inherit;border-radius:4px;border:1px solid #b7c2d1;background:#fff;color:var(--ink);padding:8px 12px}button.primary{background:#255f9c;color:white;border-color:#255f9c;font-weight:650}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #3d79b5;outline-offset:2px}
+.small{font-size:12px;color:var(--sub)}.quiet{font-size:11px;color:#7d8793}.inline-values{display:grid;grid-template-columns:1fr 1fr;gap:7px}.inline-values label{font-size:11px;color:#526174}.inline-values input{margin-top:3px}
+.radio-row{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin:6px 0 9px}.radio-row label{display:flex;align-items:center;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 3px}.chip{border:1px solid #cfd6de;background:#f8fafc;border-radius:4px;padding:4px 5px 4px 9px;font-size:12px;display:flex;align-items:center;gap:6px}.chip .remove{padding:0 5px;font-size:14px;line-height:20px;border-color:#d4dce5}
+.center{display:flex;flex-direction:column;gap:12px;min-width:0}.chart{background:white;border:1px solid var(--border);border-radius:5px;padding:11px 12px 7px;min-width:0}.chart-title{font-size:13px;font-weight:700;margin:0 0 4px}.chart-sub{color:#758091;font-size:11px;margin-bottom:4px}.chart canvas{width:100%;display:block;touch-action:none;height:220px}.chart#chart-potential canvas{height:285px}.chart#chart-wave canvas{height:300px}.chart#chart-density canvas{height:300px}
+.chart-toolbar{display:flex;gap:7px;align-items:center;margin:8px 0 3px;flex-wrap:wrap}.chart-toolbar .zoom-btn{padding:5px 9px;font-size:12px}.legend{font-size:12px;line-height:1.55;color:var(--sub)}.legend-inline{display:flex;align-items:center;gap:7px 13px;flex-wrap:wrap;margin:7px 0 2px;font-size:12px}.legend-entry{display:inline-flex;align-items:center;gap:5px}.swatch{width:15px;border-top:3px solid;display:inline-block}
+.right{display:flex;flex-direction:column;gap:13px;min-width:0}.num-panel{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.stat{border-bottom:1px solid #edf0f2;padding:8px 0}.stat .stat-label{font-size:12px;color:#637083}.stat .stat-value{font-size:16px;font-weight:650;font-variant-numeric:tabular-nums;word-break:break-word}.stat .stat-value.si{font-size:14px}.full{grid-column:1/-1}
+.messages{font-size:12px;color:#655321;background:#fcf7e8;border-left:3px solid #caa960;padding:9px;white-space:pre-line;display:none}.messages.error{background:#fff0ee;color:#973a34;border-color:#ca514b}
+.check{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:4px;background:#eff8f3;border:1px solid #c4e7d1;color:#176c3e}.check.bad{background:#fff0ee;border-color:#e9bfba;color:#a8342c}
+.help-pop{position:fixed;z-index:20;max-width:315px;padding:10px 12px;border:1px solid #acbecf;border-radius:5px;box-shadow:0 6px 22px #10203035;background:white;color:#263445;font-size:12px;display:none;pointer-events:none}
+.status{font-size:12px;color:#48617d;min-height:20px;display:flex;gap:8px;align-items:center}.status .dot{height:7px;width:7px;border-radius:50%;background:#6787a4;display:inline-block}.status.busy .dot{animation:pulse 1s ease-in-out infinite alternate}@keyframes pulse{to{opacity:.18}}
+.dependency-inline{margin:9px 0 2px;background:#fafbfc;border:1px solid var(--border);border-radius:4px;min-width:0}.dependency-inline summary{padding:7px 9px;font-size:12px;color:#255f9c;font-weight:650;cursor:pointer;list-style:none}.dependency-inline summary::-webkit-details-marker{display:none}.dependency-inline summary::after{content:"▾";float:right}.dependency-inline[open] summary::after{content:"▴"}.dependency-inline[open] summary{border-bottom:1px solid #e5e8ec}.dependency-inline .details-body{padding:7px 7px 9px}.dependency-inline .details-body p{font-size:11px;line-height:1.4;margin:4px 2px}.dependency-inline .math{font-size:13px}.dependency-inline .mini{height:180px;margin:2px 0 5px}.sidebar>.section>.num-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px}.sidebar .stat .stat-value.si{font-size:12px}.sidebar .stat .stat-value{font-size:14px}.details{padding:0;overflow:hidden}.details summary{padding:13px 14px;font-size:14px;font-weight:700;cursor:pointer;list-style:auto}.details[open] summary{border-bottom:1px solid #e5e8ec}.details-body{padding:10px 14px 13px}.details-body p{margin:6px 0 10px;font-size:12px;line-height:1.6}.mini{width:100%;height:205px;display:block;margin:3px 0 9px}.math{font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#253f60}.mathbox{background:#f5f8fb;border-left:3px solid #acc5db;padding:8px 11px;margin:8px 0;font-size:13px}
+/* Equilibrio vertical de las dos columnas en la configuración inicial: aumentan únicamente los Canvas. */
+.center{--extra-grafico:0px;--ajuste-casilla:9px}
+.chart#chart-potential canvas{height:calc(285px + var(--extra-grafico) + var(--ajuste-casilla))}
+.chart#chart-wave canvas,.chart#chart-density canvas{height:calc(300px + var(--extra-grafico) + var(--ajuste-casilla))}
+@media(min-width:1700px) and (max-width:1799px){.center{--extra-grafico:7px}}
+@media(min-width:1550px) and (max-width:1699px){.center{--extra-grafico:12px}}
+@media(min-width:1461px) and (max-width:1549px){.center{--extra-grafico:18px}}
+@media(min-width:1421px) and (max-width:1460px){.center{--extra-grafico:35px}}
+@media(min-width:1376px) and (max-width:1420px){.center{--extra-grafico:40px}}
+@media(min-width:1310px) and (max-width:1375px){.center{--extra-grafico:47px}}
+@media(min-width:1180px) and (max-width:1309px){.center{--extra-grafico:64px}}
+@media(min-width:951px) and (max-width:1179px){.center{--extra-grafico:58px;--ajuste-casilla:4px}}
+.scale-toggle{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;font-size:12px}.scale-toggle label{display:inline-flex;align-items:center;gap:7px;cursor:pointer}.scale-toggle input{margin:0;accent-color:var(--blue)}
+footer{max-width:1900px;margin:0 auto 15px;padding:0 17px;font-size:12px;color:#637081;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+@media(max-width:1420px){main{grid-template-columns:minmax(300px,23.8%) minmax(0,1fr)}}
+@media(max-width:950px){main{grid-template-columns:minmax(0,1fr)}.sidebar{grid-column:1}header{padding:11px 13px}header h1{font-size:20px}.chart canvas{height:260px!important}.mini{height:195px!important}}
+@media(max-width:400px){header{flex-direction:column;align-items:flex-start}.badge{white-space:normal}}
+</style>
+</head>
+<body>
+<header><div><h1>Física IV · Pozo lineal y pared infinita</h1><p>Estados estacionarios · Funciones de Airy · eV / nm</p></div><span class="badge pending" id="badge">Conectando con Python…</span></header>
+<main>
+<aside class="panel sidebar" aria-label="Parámetros y resultados físicos">
+ <div class="section">
+  <h2>Parámetros físicos</h2>
+  <div class="param" data-key="masa"><div class="param-label"><span class="label-left"><span class="param-name">Masa m</span><button class="help" data-help="Masa de la partícula relativa a la del electrón. Modifica la longitud característica: ℓ ∝ m⁻¹ᐟ³. El deslizador es logarítmico.">ⓘ</button></span><span class="units">mₑ</span></div>
+   <div class="param-controls"><input id="masa-range" type="range" min="-1" max="1" step="0.005" value="0" aria-label="Masa: escala logarítmica"><input id="masa-num" type="number" min="0.1" max="10" step="any" value="1" aria-label="Masa en unidades de masa electrónica"></div>
+    <details class="dependency-inline" id="dependencia-masa"><summary>Ver dependencia de la energía con la masa</summary><div class="details-body">
+     <p>Manteniendo fijos el estado n y la pendiente α: <span class="math">Eₙ ∝ m⁻¹ᐟ³</span>.</p>
+     <canvas class="mini" id="plot-mass" role="img" aria-label="Energía en función de la masa"></canvas>
+     <p class="quiet">Escala horizontal logarítmica; el punto marcado corresponde a los parámetros actuales.</p>
+    </div></details>
+  </div>
+  <div class="param" data-key="pendiente"><div class="param-label"><span class="label-left"><span class="param-name">Pendiente α</span><button class="help" data-help="U(x)=αx y Fx=−α. Se exige α>0 para obtener el espectro discreto. El deslizador usa escala logarítmica.">ⓘ</button></span><span class="units">eV/nm</span></div>
+   <div class="param-controls"><input id="pendiente-range" type="range" min="-2" max="1" step="0.005" value="0" aria-label="Pendiente logarítmica"><input id="pendiente-num" type="number" min="0.01" max="10" step="any" value="1" aria-label="Pendiente en electronvoltios por nanómetro"></div>
+    <details class="dependency-inline" id="dependencia-pendiente"><summary>Ver dependencia de la energía con α</summary><div class="details-body">
+     <p>Manteniendo fijos el estado n y la masa m: <span class="math">Eₙ ∝ α²ᐟ³</span>.</p>
+     <canvas class="mini" id="plot-slope" role="img" aria-label="Energía en función de la pendiente"></canvas>
+     <p class="quiet">Escala horizontal logarítmica; el punto marcado corresponde a los parámetros actuales.</p>
+    </div></details>
+  </div>
+  <div class="param" data-key="n"><div class="param-label"><span class="label-left"><span class="param-name">Estado principal n</span><button class="help" data-help="Número cuántico entero n=1…30. El estado n tiene exactamente n−1 nodos interiores; x=0 no se cuenta.">ⓘ</button></span><span class="units">entero</span></div>
+   <div class="param-controls"><input id="n-range" type="range" min="1" max="30" step="1" value="1" aria-label="Número cuántico"><input id="n-num" type="number" min="1" max="30" step="1" value="1" aria-label="Número cuántico exacto"></div>
+  </div>
+  <button id="reset-params" class="action primary" type="button">↺ Restablecer valores</button>
+  <div class="small" style="margin-top:9px">Los cálculos se actualizan automáticamente, sin presionar «Ejecutar».</div>
+   <div class="scale-toggle"><label for="auto-scales"><input id="auto-scales" type="checkbox"> Reajustar escalas automáticamente</label><button class="help" type="button" data-help="Reajuste automático de escalas. Cuando esta opción está activada, los ejes de los gráficos se adaptan automáticamente a los resultados físicos actuales. Cuando está desactivada, las escalas permanecen fijas al modificar los parámetros, permitiendo comparar visualmente cómo cambian las curvas y los niveles de energía. Podés utilizar el botón «Auto» de cada gráfico para reajustar su escala individualmente. Las escalas de visualización no afectan los cálculos físicos ni la normalización de las funciones de onda.">ⓘ</button></div>
+ </div>
+ <div class="section">
+  <h2>Comparación de estados estacionarios <button class="help" data-help="Son estados propios independientes del mismo potencial, no una superposición. No se suman las funciones de onda. Máximo: cuatro estados simultáneos, incluido el principal.">ⓘ</button></h2>
+  <div class="btn-row"><select id="estado-select" aria-label="Seleccionar estado a comparar" style="flex:1;min-width:105px"></select><button id="add-state" class="action" type="button">＋ Agregar</button></div>
+  <div class="chips" id="chips" aria-label="Estados representados"></div>
+  <div class="small">Hasta tres estados adicionales. Los resultados numéricos corresponden siempre al principal.</div>
+ </div>
+ <section class="section"><h2>Propiedades del estado principal</h2><div class="num-panel">
+  <div class="stat"><div class="stat-label">Energía Eₙ</div><div class="stat-value" id="r-energy">—</div></div>
+  <div class="stat"><div class="stat-label">Punto de retorno xₜ <button class="help" type="button" data-help="Punto de retorno clásico. Posición en la que la energía potencial iguala la energía total del estado: U(xₜ) = Eₙ ⇒ xₜ = Eₙ/α. Separa la región clásicamente permitida (Eₙ &gt; U) de la prohibida (Eₙ &lt; U).">ⓘ</button></div><div class="stat-value" id="r-turn">—</div></div>
+  <div class="stat"><div class="stat-label">Penetración efectiva δₙ <button class="help" data-help="Definición operacional: |ψ(xₜ+δₙ)|=|ψ(xₜ)|/e. En un potencial lineal el decaimiento no tiene κ constante; δₙ no equivale a 1/κ de una barrera rectangular.">ⓘ</button></div><div class="stat-value" id="r-delta">—</div></div>
+  <div class="stat"><div class="stat-label">Probabilidad prohibida <button class="help" type="button" data-help="Probabilidad en la región clásicamente prohibida, donde U(x) &gt; Eₙ. Se obtiene integrando P = ∫ₓₜ^∞ |ψₙ(x)|² dx. A diferencia de la mecánica clásica, esta probabilidad puede ser distinta de cero.">ⓘ</button></div><div class="stat-value" id="r-forbidden">—</div></div>
+ </div></section>
+ <section class="section"><h2>Principio de incertidumbre de Heisenberg <button class="help" data-help="Las incertidumbres son dispersiones estadísticas intrínsecas a cada estado estacionario, no errores de medición del programa.">ⓘ</button></h2>
+  <div class="mathbox math" style="text-align:center">Δx · Δp ≥ ℏ/2</div>
+  <div class="num-panel">
+   <div class="stat"><div class="stat-label">Δx</div><div class="stat-value" id="r-dx">—</div></div>
+   <div class="stat"><div class="stat-label">Δp</div><div class="stat-value si" id="r-dp">—</div></div>
+   <div class="stat"><div class="stat-label">Δx · Δp</div><div class="stat-value si" id="r-product">—</div></div>
+   <div class="stat"><div class="stat-label">Límite ℏ/2</div><div class="stat-value si" id="r-hbar">—</div></div>
+  </div><div class="check" id="check-heisenberg">Comprobando…</div>
+  <p class="small">Δx y Δp caracterizan la dispersión estadística del estado cuántico. No representan errores experimentales ni incertidumbre numérica.</p>
+  <div class="group-title">Verificación independiente de normalización</div>
+  <div class="num-panel">
+   <div class="stat"><div class="stat-label">Integral Iₙ = ∫₀∞ |ψₙ|²dx</div><div class="stat-value" id="r-integral">—</div></div>
+   <div class="stat"><div class="stat-label">Error absoluto |1 − Iₙ|</div><div class="stat-value si" id="r-normerror">—</div></div>
+  </div><div class="check" id="check-norm">Comprobando…</div><p class="quiet">Cuadratura en [0, ∞), independiente del zoom; tolerancia 10⁻⁸.</p>
+ </section>
+ <div class="section"><div class="status" id="status"><span class="dot"></span><span>Iniciando…</span></div></div>
+ <div class="messages" id="messages" role="alert"></div>
+</aside>
+
+<section class="center" aria-label="Gráficos físicos">
+ <article class="chart" id="chart-potential"><div class="chart-title">1 · Potencial y estructura de niveles de energía</div><div class="chart-sub">U(x)=αx · primeros 10 niveles (ampliados hasta n cuando corresponde) · xₜ=Eₙ/α</div>
+  <canvas id="plot-potential" role="img" aria-label="Potencial lineal y niveles de energía, pared infinita y retorno clásico"></canvas>
+  <div class="legend-inline" id="legend-potencial"></div><div class="chart-toolbar"><button class="zoom-btn" data-zoom="potencial:+">＋ Acercar</button><button class="zoom-btn" data-zoom="potencial:-">－ Alejar</button><button class="zoom-btn" data-zoom="potencial:auto">Auto</button><span class="small" id="hover-potencial"></span></div>
+ </article>
+ <article class="chart" id="chart-wave"><div class="chart-title">Funciones de onda estacionarias — Parte espacial ψₙ(x)</div><div class="chart-sub">Soluciones reales de la ecuación de Schrödinger independiente del tiempo. Se representa la amplitud con signo de cada estado estacionario.</div>
+  <canvas id="plot-wave" role="img" aria-label="Funciones de Airy normalizadas y nodos interiores"></canvas>
+  <div class="legend-inline" id="legend-onda"></div><div class="chart-toolbar"><button class="zoom-btn" data-zoom="onda:+">＋ Acercar</button><button class="zoom-btn" data-zoom="onda:-">－ Alejar</button><button class="zoom-btn" data-zoom="onda:auto">Auto</button><span class="small" id="hover-onda"></span></div>
+  <div class="small" id="node-info">Los nodos son posiciones donde ψ(x)=0 y la densidad de probabilidad se anula; x=0 es la frontera, no un nodo interior.</div>
+  <div class="mathbox math" style="margin:8px 0 5px;text-align:center">
+   <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" aria-label="Psi sub n de x, t igual a psi sub n de x multiplicado por e elevado a menos i E sub n t sobre h barra">
+    <mrow><msub><mi>Ψ</mi><mi>n</mi></msub><mo>(</mo><mi>x</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>=</mo><msub><mi>ψ</mi><mi>n</mi></msub><mo>(</mo><mi>x</mi><mo>)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>i</mi><msub><mi>E</mi><mi>n</mi></msub><mi>t</mi><mo>/</mo><mi>ℏ</mi></mrow></msup></mrow>
+   </math>
+  </div>
+  <p class="small" style="margin:0 0 4px">Se representa la componente espacial de las funciones de onda correspondientes a los estados estacionarios del sistema. La dependencia temporal consiste en un factor de fase global que no modifica la densidad de probabilidad</p>
+ </article>
+ <article class="chart" id="chart-density"><div class="chart-title">3 · Densidad de probabilidad</div><div class="chart-sub">ρₙ(x)=|ψₙ(x)|² [nm⁻¹] · zona prohibida, punto de retorno y penetración efectiva</div>
+  <canvas id="plot-density" role="img" aria-label="Densidad de probabilidad y área de penetración cuántica"></canvas>
+  <div class="legend-inline" id="legend-densidad"></div><div class="chart-toolbar"><button class="zoom-btn" data-zoom="densidad:+">＋ Acercar</button><button class="zoom-btn" data-zoom="densidad:-">－ Alejar</button><button class="zoom-btn" data-zoom="densidad:auto">Auto</button><span class="small" id="hover-densidad"></span></div>
+ </article>
+</section>
+
+</main>
+<footer><span>Autores: Cruells Julián, Grecco Malena y Perroud Aline</span><span>Simulador educativo</span></footer>
+<div id="helptip" class="help-pop" role="tooltip"></div>
+<script>
+'use strict';
+// Todos los valores físicos y curvas (incluidas las dependencias) vienen de Simulador 2 - Física.py.
+// Aquí solo se administra la interfaz, las transformaciones visuales y el dibujo Canvas.
+const $=id=>document.getElementById(id);
+const defaults={masa:1,pendiente:1,n:1,comparaciones:[]};
+const colors=['#1d5fa9','#19844b','#7b48a5','#c23d35'];
+const limits={masa:[.1,10],pendiente:[.01,10],n:[1,30]};
+const plotIds=['potencial','onda','densidad'];
+const canvases={potencial:$('plot-potential'),onda:$('plot-wave'),densidad:$('plot-density')};
+let cfg={...defaults,comparaciones:[]},data=null,runNo=0,debounce=null;
+let worker,workerReady=false,workerBusy=false,queued=false,workerFailed=false;
+function failWorker(error){workerFailed=true;workerBusy=false;badge('Error al cargar Python','error');message(String(error));status('Motor Python no disponible',false);}
+function startWorker(){
+ worker=new Worker('./worker.js');
+ worker.onerror=e=>failWorker(e.message||'No se pudo iniciar Python');
+ worker.onmessage=({data:m})=>{
+  if(m.fatal){failWorker(m.fatal);return;}
+  if(m.ready){workerReady=true;fetchPhysics();return;}
+  workerBusy=false;
+  if(m.id===runNo){
+   if(m.error){message(m.error);badge('Error en el cálculo','error');status('No se aplicaron los parámetros nuevos',false);}
+   else applyPhysics(m.resultado);
+  }
+  if(queued){queued=false;fetchPhysics();}
+ };
+}
+let localX={potencial:null,onda:null,densidad:null};
+const yManual={potencial:null,onda:null,densidad:null};
+let axesInitialized=false;
+const rangeConfig={masa:{slider:$('masa-range'),number:$('masa-num')},pendiente:{slider:$('pendiente-range'),number:$('pendiente-num')},n:{slider:$('n-range'),number:$('n-num')}};
+const fmt=(v,d=4)=>Number.isFinite(v)?v.toLocaleString('es-AR',{maximumSignificantDigits:d}):'—';
+const sci=v=>{if(!Number.isFinite(v))return '—';if(v===0)return '0';
+ const [mantisa,exponente]=v.toExponential(3).split('e');
+ const superindices={'-':'⁻','+':'⁺','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+ return `${mantisa} × 10${[...String(Number(exponente))].map(c=>superindices[c]).join('')}`;
+};
+function badge(text,kind=''){const b=$('badge');b.textContent=text;b.className='badge '+kind;}
+function status(text,busy=false){const e=$('status');e.querySelector('span:last-child').textContent=text;e.classList.toggle('busy',busy);}
+function message(text,isError=true){const el=$('messages');el.textContent=text;el.style.display=text?'block':'none';el.classList.toggle('error',isError);}
+function updateControls(){
+ for(const [name,els] of Object.entries(rangeConfig)){
+  els.number.value=String(Number(cfg[name].toPrecision?.(9)??cfg[name]));
+  els.slider.value=name==='n'?cfg.n:Math.log10(cfg[name]);
+ }
+ drawChips();fillSelector();
+}
+function handleParam(key,value){
+ if(!Number.isFinite(value)||value<limits[key][0]||value>limits[key][1]||(key==='n'&&!Number.isInteger(value))){
+  badge('Valor fuera del rango permitido','error');message('Revisá '+(key==='n'?'n: entero 1–30':key==='masa'?'la masa: 0,1–10 mₑ':'la pendiente: 0,01–10 eV/nm')+'.');return;
+ }
+ cfg[key]=value;
+ if(key==='n')cfg.comparaciones=cfg.comparaciones.filter(x=>x!==value);
+ message('',false);updateControls();requestUpdate();
+}
+for(const [key,el] of Object.entries(rangeConfig)){
+ el.slider.addEventListener('input',()=>handleParam(key,key==='n'?Number(el.slider.value):10**Number(el.slider.value)));
+ el.number.addEventListener('change',()=>handleParam(key,Number(el.number.value)));
+ el.number.addEventListener('keydown',ev=>{if(ev.key==='Enter'){el.number.blur();}});
+}
+function fillSelector(){const select=$('estado-select');const before=Number(select.value)||2;select.replaceChildren();
+ for(let i=1;i<=30;i++){
+  if(i===cfg.n||cfg.comparaciones.includes(i))continue;
+  const opt=document.createElement('option');opt.value=String(i);opt.textContent='n = '+i;select.append(opt);
+ }
+ if([...select.options].some(opt=>Number(opt.value)===before))select.value=String(before);
+ $('add-state').disabled=cfg.comparaciones.length>=3||select.options.length===0;
+}
+function drawChips(){const list=$('chips');list.replaceChildren();
+ const all=[cfg.n,...cfg.comparaciones];all.forEach((n,i)=>{
+  const box=document.createElement('span');box.className='chip';box.style.borderLeft='4px solid '+colors[i];
+  const label=document.createElement('span');label.textContent=`n = ${n}${i===0?' · principal':''}`;box.append(label);
+  if(i>0){const rem=document.createElement('button');rem.type='button';rem.className='remove';rem.title='Eliminar estado n='+n;rem.setAttribute('aria-label','Eliminar estado '+n);rem.textContent='×';rem.addEventListener('click',()=>{cfg.comparaciones=cfg.comparaciones.filter(v=>v!==n);updateControls();requestUpdate();});box.append(rem);}
+  list.append(box);
+ });
+}
+$('add-state').addEventListener('click',()=>{
+ const n=Number($('estado-select').value);
+ if(!Number.isInteger(n)||n===cfg.n||cfg.comparaciones.includes(n)||cfg.comparaciones.length>=3)return;
+ cfg.comparaciones.push(n);updateControls();requestUpdate();
+});
+$('reset-params').addEventListener('click',()=>{cfg={...defaults,comparaciones:[]};updateControls();message('',false);requestUpdate(true);});
+function requestUpdate(immediate=false){
+ if(workerFailed)return;
+ ++runNo;badge('Actualizando con Python…','pending');status('Parámetros modificados · solicitando resultado',true);
+ clearTimeout(debounce);queued=false;
+ debounce=setTimeout(fetchPhysics,immediate?0:170);
+}
+function fetchPhysics(){
+ if(workerFailed||!workerReady)return;
+ if(workerBusy){queued=true;return;}
+ workerBusy=true;status('Calculando funciones de Airy e integrales…',true);
+ worker.postMessage({id:runNo,body:cfg});
+}
+function applyPhysics(body){
+ try{data=body;
+ if(!axesInitialized || $('auto-scales').checked){for(const id of plotIds)setAutomaticView(id);axesInitialized=true;}
+ renderAll();message('',false);badge('Cálculo Python actualizado');
+ status(`Estado principal n=${data.config.n} · ${data.niveles.length} niveles · solución Airy`,false);
+ }catch(ex){message(ex.message||String(ex));badge('Error en el cálculo','error');status('No se pudieron mostrar los resultados',false);}
+}
+function text(id,v){$(id).textContent=v;}
+function fillResults(){if(!data)return;const p=data.propiedades,u=data.incertidumbre,z=data.normalizacion;
+ text('r-energy',fmt(p.energia_ev,6)+' eV');text('r-turn',fmt(p.x_retorno_nm,6)+' nm');
+ text('r-delta',fmt(p.penetracion_nm,5)+' nm');text('r-forbidden',fmt(100*p.probabilidad_prohibida,5)+' %');
+ text('r-dx',fmt(u.delta_x_nm,6)+' nm');text('r-dp',sci(u.delta_p_si)+' kg·m/s');
+ text('r-product',sci(u.producto_si)+' J·s');text('r-hbar',sci(u.limite_si)+' J·s');
+ text('r-integral',z.integral.toFixed(12));text('r-normerror',sci(z.error_absoluto));
+ const h=$('check-heisenberg');h.classList.toggle('bad',!u.cumple);h.textContent=(u.cumple?'✓ Se cumple':'✗ No se verifica')+' el principio de incertidumbre de Heisenberg';
+ const norm=$('check-norm');norm.classList.toggle('bad',!z.correcta);norm.textContent=(z.correcta?'✓ Normalización correcta':'✗ Normalización fuera de tolerancia')+' (ε ≤ 10⁻⁸)';
+ text('node-info',`Estado principal n=${data.config.n}: ${p.nodos_interiores} nodo${p.nodos_interiores===1?'':'s'} interior${p.nodos_interiores===1?'':'es'}. Un nodo es una posición de probabilidad nula; x=0 es condición de frontera y no se cuenta.`);
+}
+function drawLegends(){if(!data)return;for(const id of plotIds){const container=$('legend-'+id);container.replaceChildren();
+ data.onda.estados.forEach(st=>{const entry=document.createElement('span');entry.className='legend-entry';const swatch=document.createElement('span');swatch.className='swatch';swatch.style.borderColor=st.color;const lab=document.createElement('span');lab.textContent=`n=${st.n}${st.principal?' (principal)':''}`;entry.append(swatch,lab);container.append(entry);});
+ }}
+// Motor Canvas: coordenadas y formato de ejes, sin cálculos de estados físicos.
+function canvasCtx(canvas){const w=Math.max(180,canvas.clientWidth),h=Math.max(135,canvas.clientHeight),pixelRatio=Math.min(devicePixelRatio||1,2);
+ const cw=Math.round(w*pixelRatio),ch=Math.round(h*pixelRatio);
+ if(canvas.width!==cw||canvas.height!==ch){canvas.width=cw;canvas.height=ch;}
+ const ctx=canvas.getContext('2d');ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);ctx.clearRect(0,0,w,h);
+ return{ctx,w,h,b:{l:59,t:25,r:w-18,b:h-39}};
+}
+function niceStep(length,target=6){const x=Math.max(1e-12,length/target),unit=10**Math.floor(Math.log10(x));return([1,2,2.5,5,10].find(k=>k*unit>=x)||10)*unit;}
+function axes(canvas,xlim,ylim,xlabel,ylabel,options={}){
+ const {ctx,w,h,b}=canvasCtx(canvas);const [x0,x1]=xlim,[y0,y1]=ylim;
+ const X=x=>b.l+(x-x0)/(x1-x0)*(b.r-b.l),Y=y=>b.b-(y-y0)/(y1-y0)*(b.b-b.t);
+ ctx.fillStyle='white';ctx.fillRect(0,0,w,h);ctx.font='11px system-ui,Arial';ctx.textBaseline='middle';ctx.lineWidth=.85;
+ const xstep=niceStep(x1-x0),ystep=niceStep(y1-y0);
+ const ticks=options.xTicks || Array.from({length:Math.min(40,Math.floor((x1-Math.ceil(x0/xstep)*xstep)/xstep+1.00001))},(_,i)=>Math.ceil(x0/xstep)*xstep+i*xstep);
+ for(const x of ticks){
+  const px=X(x);ctx.strokeStyle='#e8ebef';ctx.beginPath();ctx.moveTo(px,b.t);ctx.lineTo(px,b.b);ctx.stroke();
+  ctx.fillStyle='#667386';ctx.textAlign='center';ctx.fillText(options.xLabel?options.xLabel(x):(Math.abs(x)<xstep*1e-6?'0':Number(x.toPrecision(4)).toString()),px,b.b+15);
+ }
+ for(let y=Math.ceil(y0/ystep)*ystep,count=0;y<=y1+ystep*1e-7&&count<40;y+=ystep,count++){
+  const py=Y(y);ctx.strokeStyle='#e8ebef';ctx.beginPath();ctx.moveTo(b.l,py);ctx.lineTo(b.r,py);ctx.stroke();
+  ctx.fillStyle='#667386';ctx.textAlign='right';ctx.fillText(Math.abs(y)<ystep*1e-6?'0':Number(y.toPrecision(4)).toString(),b.l-7,py);
+ }
+ ctx.strokeStyle='#7d8a9a';ctx.lineWidth=1;ctx.strokeRect(b.l,b.t,b.r-b.l,b.b-b.t);
+ ctx.font='11px system-ui,Arial';ctx.fillStyle='#394658';ctx.textAlign='center';ctx.fillText(xlabel,(b.l+b.r)/2,h-9);
+ ctx.save();ctx.translate(13,(b.t+b.b)/2);ctx.rotate(-Math.PI/2);ctx.fillText(ylabel,0,0);ctx.restore();
+ ctx.save();ctx.beginPath();ctx.rect(b.l,b.t,b.r-b.l,b.b-b.t);ctx.clip();
+ return {ctx,w,h,b,X,Y,xlim,ylim,finish:()=>ctx.restore()};
+}
+function plotLine(ax,xs,ys,color,width=1.8,dash=[]){const {ctx,X,Y}=ax;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();let live=false;
+ for(let i=0;i<xs.length;i++){if(!Number.isFinite(ys[i])||!Number.isFinite(xs[i])){live=false;continue;}
+  if(!live){ctx.moveTo(X(xs[i]),Y(ys[i]));live=true;}else ctx.lineTo(X(xs[i]),Y(ys[i]));}
+ ctx.stroke();ctx.setLineDash([]);
+}
+function vline(ax,x,color='#73849b',dash=[4,4],width=1.3){const{ctx,Y,X,b}=ax;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(X(x),b.t);ctx.lineTo(X(x),b.b);ctx.stroke();ctx.setLineDash([]);}
+function hline(ax,y,color='#73849b',dash=[4,4],width=1.3){const{ctx,Y,X,b}=ax;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(b.l,Y(y));ctx.lineTo(b.r,Y(y));ctx.stroke();ctx.setLineDash([]);}
+function bgPhysical(ax,shadeForbidden=true){const {ctx,b,X,xlim}=ax,xt=data.propiedades.x_retorno_nm;
+ if(xlim[0]<0){const w=Math.max(0,X(0)-b.l);ctx.fillStyle='rgba(121,130,144,.23)';ctx.fillRect(b.l,b.t,w,b.b-b.t);}
+ if(shadeForbidden&&xt<xlim[1]){ctx.fillStyle='rgba(212,168,82,.10)';ctx.fillRect(Math.max(b.l,X(xt)),b.t,b.r-Math.max(b.l,X(xt)),b.b-b.t);}
+ vline(ax,0,'#555f6b',[],2.5);
+ const wallX=Math.max(b.l+4,Math.min(b.r-120,X(0)+6));ctx.fillStyle='#596575';ctx.font='10px system-ui';ctx.textAlign='left';ctx.fillText('Pared infinita · U = ∞',wallX,b.t+11);
+}
+function defaultX(id){if(!data)return[-1,5];const xmax=id==='potencial'?data.escalas.x_potencial_max_nm:data.escalas.x_onda_max_nm;
+ return[-.055*xmax,xmax];}
+function viewX(id){return localX[id]||defaultX(id);}
+function autoY(id){if(!data)return[0,1];const p=data.propiedades,states=data.onda.estados;
+ if(id==='potencial'){
+  return[0,data.escalas.potencial_auto_y_max_ev];
+ }
+ if(id==='onda'){
+  let high=0;for(const s of states)for(const v of s.psi)high=Math.max(high,Math.abs(v));return[-Math.max(high*1.17,.01),Math.max(high*1.17,.01)];
+ }
+ let high=0;for(const s of states)for(const v of s.rho)high=Math.max(high,v);
+ return[0,Math.max(high*1.21,.01)];
+}
+function viewY(id){return yManual[id]||autoY(id);}
+function arrow(ax,x1,x2,y){const{ctx,X,Y}=ax;const px1=X(x1),px2=X(x2),py=Y(y);
+ ctx.strokeStyle='#9e6b16';ctx.fillStyle='#9e6b16';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(px1,py);ctx.lineTo(px2,py);ctx.stroke();
+ const step=px2>=px1?1:-1;for(const [x,sgn] of [[px1,-step],[px2,step]]){
+  ctx.beginPath();ctx.moveTo(x,py);ctx.lineTo(x-sgn*6,py-3);ctx.lineTo(x-sgn*6,py+3);ctx.closePath();ctx.fill();
+ }
+ ctx.textAlign='center';ctx.font='11px system-ui';ctx.fillText('δₙ',Math.abs(px2-px1)<44?Math.min(ax.b.r-17,px2+19):.5*(px1+px2),py-11);
+}
+function drawPotential(){if(!data)return;const ax=axes(canvases.potencial,viewX('potencial'),viewY('potencial'),'x (nm)','Energía (eV)');bgPhysical(ax,true);
+ const ctx=ax.ctx,p=data.propiedades;
+ // Los niveles son líneas horizontales completas desde la pared hasta el límite del gráfico.
+ for(const level of data.niveles){const found=data.onda.estados.find(s=>s.n===level.n);
+  const col=found?found.color:'#c1cad6';ctx.strokeStyle=col;ctx.lineWidth=found?2.5:1.1;ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(ax.X(0),ax.Y(level.energia_ev));ctx.lineTo(ax.b.r,ax.Y(level.energia_ev));ctx.stroke();
+  const label=(level.n%2===0&&data.niveles.length>15&&!found)?'':`E${level.n}`;
+  if(label){ctx.fillStyle=found?col:'#7a899b';ctx.font=(found?'bold ':'')+'10px system-ui';ctx.textAlign='right';ctx.fillText(label,ax.b.r-4,ax.Y(level.energia_ev)-5);}
+ }
+ plotLine(ax,data.potencial.x_nm,data.potencial.u_ev,'#222831',2.5);
+ vline(ax,p.x_retorno_nm,colors[0],[5,4],1.5);
+ const y=ax.Y(p.energia_ev);ctx.fillStyle=colors[0];ctx.beginPath();ctx.arc(ax.X(p.x_retorno_nm),y,4.3,0,2*Math.PI);ctx.fill();
+ ctx.font='11px system-ui';ctx.textAlign='left';ctx.fillStyle=colors[0];ctx.fillText('xₜ',ax.X(p.x_retorno_nm)+6,Math.min(ax.b.b-13,y+14));
+ ax.finish();
+}
+function drawWave(){if(!data)return;const ax=axes(canvases.onda,viewX('onda'),viewY('onda'),'x (nm)','ψ (nm⁻¹ᐟ²)');bgPhysical(ax,true);hline(ax,0,'#6c7a8a',[],1.3);
+ const xs=data.onda.x_nm;for(const s of [...data.onda.estados].reverse()){
+  plotLine(ax,xs,s.psi,s.color,s.principal?2.3:1.65);
+  for(const x of s.nodos_nm){ax.ctx.fillStyle=s.color;ax.ctx.strokeStyle='white';ax.ctx.lineWidth=.7;ax.ctx.beginPath();ax.ctx.arc(ax.X(x),ax.Y(0),s.principal?3.3:2.7,0,2*Math.PI);ax.ctx.fill();ax.ctx.stroke();}
+ }
+ vline(ax,data.propiedades.x_retorno_nm,'#ab8b55',[4,5],1.1);ax.finish();
+}
+function fillForbidden(ax,xs,ys,xt){const{ctx,X,Y,b}=ax;ctx.beginPath();let started=false;
+ for(let i=0;i<xs.length;i++){const x=xs[i];if(x<xt)continue;
+  if(!started){ctx.moveTo(X(x),Y(0));started=true;}ctx.lineTo(X(x),Y(ys[i]));}
+ if(started){ctx.lineTo(X(xs.at(-1)),Y(0));ctx.closePath();ctx.fillStyle='rgba(29,95,169,.23)';ctx.fill();}
+}
+function drawDensity(){if(!data)return;const ax=axes(canvases.densidad,viewX('densidad'),viewY('densidad'),'x (nm)','|ψ|² (nm⁻¹)');bgPhysical(ax,true);
+ const xs=data.onda.x_nm,states=data.onda.estados,p=data.propiedades;
+ fillForbidden(ax,xs,states[0].rho,p.x_retorno_nm);
+ for(const s of [...states].reverse())plotLine(ax,xs,s.rho,s.color,s.principal?2.4:1.7);
+ vline(ax,p.x_retorno_nm,'#b47921',[5,4],1.6);
+ vline(ax,p.x_penetracion_nm,'#a87826',[2,4],1.15);
+ const y=ax.ylim[0]+.76*(ax.ylim[1]-ax.ylim[0]);arrow(ax,p.x_retorno_nm,p.x_penetracion_nm,y);
+ const ctx=ax.ctx;ctx.font='11px system-ui';ctx.fillStyle='#966718';
+ ctx.textAlign='right';ctx.fillText('xₜ',ax.X(p.x_retorno_nm)-5,ax.b.t+24);
+ ctx.textAlign='left';ctx.fillText('xₜ + δₙ',ax.X(p.x_penetracion_nm)+6,ax.b.t+45);
+ ax.finish();
+}
+function drawDependency(canvas,xs,ys,xMarker,yMarker,label){
+ if(!data)return;
+ const xmin=Math.log10(xs[0]),xmax=Math.log10(xs.at(-1)),ymax=Math.max(...ys)*1.11;
+ const ticks=[];for(let j=Math.ceil(xmin-1e-9);j<=Math.floor(xmax+1e-9);j++)ticks.push(j);
+ const ax=axes(canvas,[xmin,xmax],[0,ymax],label,'Eₙ (eV)',{
+  xTicks:ticks,xLabel:j=>Number((10**j).toPrecision(4)).toString()
+ });
+ const ctx=ax.ctx;
+ plotLine(ax,xs.map(Math.log10),ys,'#7b48a5',2);
+ ctx.fillStyle='#c23d35';ctx.beginPath();ctx.arc(ax.X(Math.log10(xMarker)),ax.Y(yMarker),4.5,0,Math.PI*2);ctx.fill();
+ ax.finish();
+}
+function renderDeps(){if(!data)return;
+ const d=data.dependencias;
+ if($('dependencia-masa').open){
+  drawDependency($('plot-mass'),d.masas,d.energias_masa,data.config.masa,data.propiedades.energia_ev,'m (mₑ, log)');
+ }
+ if($('dependencia-pendiente').open){
+  drawDependency($('plot-slope'),d.pendientes,d.energias_pendiente,data.config.pendiente,data.propiedades.energia_ev,'α (eV/nm, log)');
+ }
+}
+
+function drawAll(){if(!data)return;drawPotential();drawWave();drawDensity();renderDeps();}
+function renderAll(){fillResults();drawLegends();drawAll();}
+for(const id of ['dependencia-masa','dependencia-pendiente'])$(id).addEventListener('toggle',()=>{if($(id).open)requestAnimationFrame(renderDeps);});
+ // Escalas automáticas o fijas sin modificar los datos físicos recibidos desde Python.
+function setAutomaticView(id){
+ if(!data)return;
+ // Guardar copias independientes: la vista puede congelarse al desmarcar el reajuste.
+ localX[id]=[...defaultX(id)];
+ yManual[id]=[...autoY(id)];
+}
+function resetAxes(){
+ if(!data)return;
+ for(const id of plotIds)setAutomaticView(id);
+ axesInitialized=true;
+ drawAll();
+}
+$('auto-scales').addEventListener('change',()=>{
+ // Al activar se ajustan los tres gráficos; al desactivar se congela la vista actual.
+ if($('auto-scales').checked)resetAxes();
+});
+function xZoom(id,factor,pivot=.5){if(!data)return;
+ const [lo,hi]=viewX(id),length=(hi-lo)*factor,p=lo+(hi-lo)*pivot;
+ if(length<1e-6||length>1e5)return;
+ localX[id]=[p-length*pivot,p+length*(1-pivot)];drawAll();
+}
+function yZoom(id,factor){const [lo,hi]=viewY(id),mid=(lo+hi)/2;let half=(hi-lo)*factor/2;
+ if(half<1e-9||half>1e8)return;yManual[id]=[mid-half,mid+half];drawAll();
+}
+document.querySelectorAll('[data-zoom]').forEach(button=>button.addEventListener('click',()=>{
+ const [id,action]=button.dataset.zoom.split(':');
+ if(action==='auto'){setAutomaticView(id);drawAll();}else xZoom(id,action==='+'?.76:1.33);
+}));
+for(const [id,canvas] of Object.entries(canvases)){
+ let drag=null;
+ canvas.addEventListener('wheel',ev=>{if(!data)return;ev.preventDefault();if(ev.altKey){yZoom(id,ev.deltaY<0?.82:1.22);return;}
+  const rect=canvas.getBoundingClientRect(),ratio=Math.max(0,Math.min(1,(ev.clientX-rect.left-59)/(rect.width-77)));xZoom(id,ev.deltaY<0?.82:1.22,ratio);
+ },{passive:false});
+ canvas.addEventListener('pointerdown',ev=>{if(!data)return;drag={x:ev.clientX,from:[...viewX(id)]};canvas.setPointerCapture(ev.pointerId);});
+ canvas.addEventListener('pointermove',ev=>{
+  if(!data)return;
+  if(drag){const dx=(ev.clientX-drag.x)/Math.max(canvas.clientWidth-77,1)*(drag.from[1]-drag.from[0]);localX[id]=[drag.from[0]-dx,drag.from[1]-dx];drawAll();}
+  else {const rect=canvas.getBoundingClientRect(),x=viewX(id)[0]+(ev.clientX-rect.left-59)/Math.max(1,rect.width-77)*(viewX(id)[1]-viewX(id)[0]);
+   const label=$('hover-'+id);label.textContent=`x ≈ ${fmt(x,4)} nm`;}
+ });
+ canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('pointercancel',()=>drag=null);
+ canvas.addEventListener('pointerleave',()=>{$('hover-'+id).textContent='';});
+}
+const tip=$('helptip');document.querySelectorAll('.help').forEach(b=>{
+ const show=()=>{tip.textContent=b.dataset.help;const rect=b.getBoundingClientRect();tip.style.left=Math.max(9,Math.min(window.innerWidth-330,rect.right+8))+'px';tip.style.top=Math.max(8,Math.min(window.innerHeight-145,rect.top))+'px';tip.style.display='block';};
+ b.addEventListener('mouseenter',show);b.addEventListener('focus',show);b.addEventListener('click',()=>{show();setTimeout(()=>tip.style.display='none',4500);});
+ b.addEventListener('mouseleave',()=>tip.style.display='none');b.addEventListener('blur',()=>tip.style.display='none');
+});
+window.addEventListener('resize',()=>{if(data)drawAll();});
+if('ResizeObserver' in window){const ro=new ResizeObserver(()=>{if(data)drawAll();});for(const v of Object.values(canvases))ro.observe(v);ro.observe($('plot-mass'));ro.observe($('plot-slope'));}
+(function startup(){updateControls();badge('Cargando Python y SciPy…','pending');status('Primera carga: descargando motor de cálculo',true);try{startWorker();}catch(e){failWorker(e.message);}})();
+</script>
+</body>
+</html>
